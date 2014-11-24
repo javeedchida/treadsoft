@@ -1,4 +1,4 @@
 treadsoft
 =========
 
-Welcome to Javeed's Pubilc Github Reopsitory. 
+Welcome to treadsoft, where we tread softly upon all things soft.
