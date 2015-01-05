@@ -1,0 +1,9 @@
+<connections>
+    <connection name="MLPK-Dev">
+	<driverJar>ojdbc6.jar</driverJar>
+	<driverClass>oracle.jdbc.OracleDriver</driverClass>
+	<jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>
+	<username>username</username>
+	<password>password</password>
+    </connection>
+</connections>
