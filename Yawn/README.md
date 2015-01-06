@@ -28,9 +28,12 @@ JDK 1.7.x
 
 ##Usage
 From the command line, run:
+```
 java -jar Yawn-1.0.jar c:\temp\yawn-connections.xml
+```
 
 ###Example yawn-connections.xml
+```
 <connections>
     <connection name="my-database">
 	<driverJar>ojdbc6.jar</driverJar>
@@ -40,5 +43,5 @@ java -jar Yawn-1.0.jar c:\temp\yawn-connections.xml
 	<password>password</password>
     </connection>
 </connections>
-
+```
 *Yawn!
