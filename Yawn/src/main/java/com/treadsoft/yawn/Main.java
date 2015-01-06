@@ -109,7 +109,10 @@ public class Main implements ActionListener{
         if( e.getActionCommand().equalsIgnoreCase("Go") ){
             try{
                 if(currentConnection != null){
-                    executeCommand(currentConnection, queryArea.getText());
+                    String result = executeCommand(currentConnection, queryArea.getText());
+                    if(result != null){ // error occurred
+                        statusArea.setText(statusArea.getText() + "\n" + result);
+                    }
                 }else{
                     statusArea.setText(statusArea.getText() + "\n No connection available");
                 }
@@ -174,11 +177,10 @@ public class Main implements ActionListener{
         return conn;
     }
     
-    private boolean executeCommand(java.sql.Connection con, String query) throws SQLException {
-        String status = "";
+    private String executeCommand(java.sql.Connection con, String query) throws SQLException {
         Statement stmt = null;
         if( query.trim().length() == 0 ){
-            return true;
+            return null;
         }
         try{
             stmt = con.createStatement();
@@ -193,11 +195,11 @@ public class Main implements ActionListener{
             */
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return e.getMessage();
         } finally {
             if (stmt != null) { stmt.close(); }
         }        
-        return true;
+        return null;
     }
 
     private java.sql.Connection getSqlConnection(Connection connection){
