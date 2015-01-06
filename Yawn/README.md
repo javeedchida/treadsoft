@@ -44,4 +44,4 @@ java -jar Yawn-1.0.jar c:\temp\yawn-connections.xml
     </connection>
 </connections>
 ```
-*Yawn!
+*Yawn!*
