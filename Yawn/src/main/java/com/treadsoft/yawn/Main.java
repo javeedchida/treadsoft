@@ -26,6 +26,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.UIManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -39,18 +43,22 @@ import javax.xml.bind.Unmarshaller;
 public class Main implements ActionListener{
     
     private static TextArea queryArea = new TextArea("");
+    private static SimpleDateFormat statusDateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
     private static TextArea statusArea = new TextArea("Yawn! " 
-            + new SimpleDateFormat("MMM dd yyyy @ HH:mm:ss").format(new Date()));
+            + statusDateFormat.format(new Date()));
     private static Connections configuredConnections;
     private static java.sql.Connection currentConnection;
     private static String yawnConfigurationPath;
     
+    static{
+        statusArea.setEditable(false);
+    }
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    private void createAndShowGUI() {
+    private void createAndShowGUI() {        
         //Create and set up the window.
         JFrame frame = new JFrame("MainLayout");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,14 +69,17 @@ public class Main implements ActionListener{
         
         //Add 
         JPanel p = new JPanel(new BorderLayout());
-        p.add(connectionsPanel, BorderLayout.PAGE_START);
-        //p.add(new JLabel("Menu tab"), BorderLayout.LINE_START);
-        p.add(queryArea, BorderLayout.CENTER);
         
         JButton btnGo = new JButton("Go");
-        btnGo.setBackground(Color.GREEN);
+        btnGo.setBackground(new Color(0, 180, 0));
         btnGo.addActionListener(this);
-        p.add(btnGo, BorderLayout.LINE_END);
+       
+        JPanel headerPanel = new JPanel(new FlowLayout());
+        headerPanel.add(connectionsPanel);
+        headerPanel.add(btnGo);
+        p.add(headerPanel, BorderLayout.PAGE_START);
+        p.add(queryArea, BorderLayout.CENTER);
+        
         p.add(statusArea, BorderLayout.PAGE_END);
         
         frame.setContentPane(p);
@@ -111,10 +122,10 @@ public class Main implements ActionListener{
                 if(currentConnection != null){
                     String result = executeCommand(currentConnection, queryArea.getText());
                     if(result != null){ // error occurred
-                        statusArea.setText(statusArea.getText() + "\n" + result);
+                        statusLog(result);
                     }
                 }else{
-                    statusArea.setText(statusArea.getText() + "\n No connection available");
+                    statusLog("No connection available");
                 }
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
@@ -129,7 +140,7 @@ public class Main implements ActionListener{
                     currentConnection.close();
                 }
                 currentConnection = createSqlConnection(selectedConnection);
-                statusArea.setText(statusArea.getText() + "\nConnection established for " + selectedConnection.getName());
+                statusLog("Connection established for " + selectedConnection.getName());
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
             }
@@ -173,7 +184,6 @@ public class Main implements ActionListener{
         connectionProps.put("password", c.getPassword());
         addToClasspath(c.getDriverJar());
         conn = DriverManager.getConnection(c.getJdbcConnectionString(), connectionProps);
-        System.out.println("Connected to database");
         return conn;
     }
     
@@ -186,7 +196,7 @@ public class Main implements ActionListener{
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             ResultSetMetaData metadata = rs.getMetaData();
-            statusArea.setText(statusArea.getText() + "\n" + metadata.getColumnCount() + " columns returned");
+            statusLog(metadata.getColumnCount() + " columns returned");
             /*
             while (rs.next()) {
                 String coffeeName = rs.getString("COF_NAME");
@@ -195,7 +205,9 @@ public class Main implements ActionListener{
             */
         } catch (SQLException e) {
             e.printStackTrace();
-            return e.getMessage();
+            return "------------------------------------------------------------------\n" +
+                    e.getMessage() +
+                    "------------------------------------------------------------------";
         } finally {
             if (stmt != null) { stmt.close(); }
         }        
@@ -233,8 +245,20 @@ public class Main implements ActionListener{
                     System.exit(-1);
                 }
                 Main.yawnConfigurationPath = args[0];
+                if(args.length == 2 && args[1] != null && args[1].equalsIgnoreCase("windows")){
+                    try{
+                        UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                    }catch( Exception e ){
+                        e.printStackTrace();
+                    }
+                }
                 new Main().createAndShowGUI();
             }
         });
+    }
+    
+    private void statusLog(String log){
+        statusDateFormat.format(new Date());
+        statusArea.setText(log + "\n" + statusArea.getText());
     }
 }
