@@ -1,6 +1,6 @@
 #Yawn 1.0
 
-Yawn is a very basic JDBC SQL Client that remembers and organizes all SQL statements that pass through it.
+Yawn is a very basic JDBC SQL client that preserves and organizes the history (and more) of SQL statements that pass through it.
 
 ***Currently under development***
 
