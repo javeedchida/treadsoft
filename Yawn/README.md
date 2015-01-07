@@ -1,8 +1,8 @@
+***Curently under development***
+
 #Yawn 1.0
 
 Yawn is a very basic JDBC SQL client that preserves and organizes the history (and more) of SQL statements that pass through it.
-
-***Currently under development***
 
 ## You Should Know...
 If all you need is another database client, you need much more than this application. I recommend you get something more robust like Squirrel SQL instead. If you still want to know more about Yawn, read on.
