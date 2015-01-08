@@ -10,13 +10,13 @@ Well, if you put it that way: an after-hours endeavor aimed at filling one of ma
 If all you need is another database client, you need much more than this little application. I recommend you get something more robust like Squirrel SQL instead. If you still want to know more about Yawn, read on.
 
 ## Features
-### Summary
+### In Summary
 * one command window with very little other clutter around it
 * automatic logging of queries, results, and more
 * support for multiple connections with click-and-fire capability
 * XML-configurable connections and logging
 
-### Details
+### In Detail
 * Yawn is intended to be command-window centric. You have one and only one command window. 
 * Every SQL statement you run will be remembered in a *run subfolder* for the selected database. So you don't have to worry about having to remember to save any of your SQL for later reference. Every run subfolder has the following files written to it for each run.
   - run.sql containing the SQL statement that was run
