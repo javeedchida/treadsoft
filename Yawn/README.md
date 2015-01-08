@@ -29,20 +29,24 @@ If all you need is another database client, you need much more than this applica
 ### Typical Use Case For Yawn
 * Yawn might be useful when you want a simple SQL execution environment that lets you run the same SQL statement against multiple database environments (dev, test, stage, prod) in a fairly quick manner. Yawn is good for spot checking result set metadata.
 
+## System Requirements
+JRE 6 or above
+
 ## Usage
-From the command line, run:
+### From the command line, run:
 ```
-java -jar Yawn-1.0.jar c:\temp\yawn-connections.xml
+java -jar yawn.jar ./yawnconfig.xml [windows]
 ```
+Note the optional windows parameter to use the native Windows look-and-feel.
 
 ### Example Configuration File
 ```
 <yawn>
-    <logRoot>c:/dev/yawn-log</logRoot>
+    <logRoot>~/home/jchida/yawn-log</logRoot>
     <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
     <connections>
-        <connection name="my-database">
-            <driverJar>ojdbc6.jar</driverJar>
+        <connection name="Sample database">
+            <driverJar>c:/path-to-driver-jar/ojdbc6.jar</driverJar>
             <driverClass>oracle.jdbc.OracleDriver</driverClass>
             <jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>
             <username>username</username>
