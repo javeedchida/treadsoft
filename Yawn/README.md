@@ -1,15 +1,17 @@
-***Curently under development***
+# Yawn 1.0
 
-#Yawn 1.0
+## What is Yawn?
+A very basic JDBC SQL client that preserves and organizes the history (and more) of all SQL statements that pass through it.
 
-Yawn is a very basic JDBC SQL client that preserves and organizes the history (and more) of SQL statements that pass through it.
+### What is Yawn, **really**?
+Well, if you put it that way: an after-hours endeavor aimed at filling one of many tiny gaps in my development productivity toolbox. Besides, I got curious about how much the Swing API had evolved.
 
-## You Should Know...
-If all you need is another database client, you need much more than this application. I recommend you get something more robust like Squirrel SQL instead. If you still want to know more about Yawn, read on.
+## What You Should Know
+If all you need is another database client, you need much more than this little application. I recommend you get something more robust like Squirrel SQL instead. If you still want to know more about Yawn, read on.
 
 ## Features
 ### Summary
-* one command window
+* one command window with very little other clutter around it
 * automatic logging of queries, results, and more
 * support for multiple connections with click-and-fire capability
 * XML-configurable connections and logging
