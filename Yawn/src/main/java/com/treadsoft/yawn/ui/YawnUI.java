@@ -17,7 +17,6 @@
 package com.treadsoft.yawn.ui;
 
 import com.treadsoft.yawn.Config;
-import com.treadsoft.yawn.Main;
 import com.treadsoft.yawn.sql.SqlHelper;
 import com.treadsoft.yawn.xml.Connection;
 import java.awt.BorderLayout;
@@ -38,7 +37,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
 
 /**
  *
@@ -54,8 +52,8 @@ public class YawnUI implements ActionListener {
     private static Connection currentYawnConnection;
     
     static{
-        messageArea.setForeground(new Color(0, 180, 0));
-        errorArea.setForeground(new Color(180, 0, 0));
+        messageArea.setForeground(new Color(0, 160, 0));
+        errorArea.setForeground(new Color(160, 0, 0));
         statusTabs.addTab("Messages", messageArea);
         statusTabs.addTab("Errors", errorArea);
         errorLog("Yawn! Error messages get posted here. Most recent on top.");
@@ -91,7 +89,6 @@ public class YawnUI implements ActionListener {
         JPanel p = new JPanel(new BorderLayout());
         
         JButton btnGo = new JButton("Go");
-        btnGo.setBackground(new Color(0, 180, 0));
         btnGo.addActionListener(this);
        
         JPanel headerPanel = new JPanel(new FlowLayout());
@@ -119,7 +116,7 @@ public class YawnUI implements ActionListener {
         JRadioButton connection = null;
         //Read configured connections
         for(Connection c: Config.getInstance().get().getYawnConnections().getConnections()){
-            System.out.println(c);
+            System.out.println("Reading connection " + c);
             connection = new JRadioButton(c.getName());
             connection.setActionCommand("Database " + c.getName());
             connection.setName(c.getName());
@@ -136,20 +133,22 @@ public class YawnUI implements ActionListener {
     
     public void actionPerformed(ActionEvent e) {
         if( e.getActionCommand().equalsIgnoreCase("Go") ){
-            try{
-                if(currentConnection != null){
-                    String result = SqlHelper.executeCommand(currentYawnConnection.getName(), currentConnection, queryArea.getText());
-                    if(result != null){ // error occurred
-                        errorLog(result);
-                    } else {
-                        messageLog("Statement ran successfully");
-                        
+            if(queryArea.getText().trim().length() > 0){
+                try{
+                    if(currentConnection != null){
+                        String result = SqlHelper.executeCommand(currentYawnConnection.getName(), currentConnection, queryArea.getText());
+                        if(result != null){ // error occurred
+                            errorLog(result);
+                        } else {
+                            messageLog("Statement ran successfully");
+
+                        }
+                    }else{
+                        messageLog("No connection available");
                     }
-                }else{
-                    messageLog("No connection available");
-                }
-            }catch( SQLException sqle ){
-                sqle.printStackTrace();
+                }catch( SQLException sqle ){
+                    sqle.printStackTrace();
+                }                
             }
         }
         if( e.getActionCommand().startsWith("Database") ){

@@ -87,7 +87,7 @@ public class Connection {
     
     public String toString(){
         StringBuilder sb = new StringBuilder("");
-        sb.append("name: ").append(this.name).append("\n")
+        sb.append(this.name).append("\n")
             .append("driverJar:").append(this.driverJar).append("\n")
             .append("driverClass:").append(this.driverClass).append("\n")
             .append("jdbcConnectionString:").append(this.jdbcConnectionString).append("\n")
