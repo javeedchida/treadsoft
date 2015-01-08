@@ -16,31 +16,52 @@
  */
 package com.treadsoft.yawn.xml;
 
-import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * POJO for the connections element
+ *
  * @author jchida
  */
-public class Connections {
-    private List<Connection> connections;
+@XmlRootElement (name="yawn")
+public class YawnConfiguration {
+    private Connections connections;
+    private String logRoot;
+    private String runFolderPrefixDateFormat;
+    private String yawnLog;
 
-    @XmlElement (name="connection")
-    public List<Connection> getConnections() {
+    @XmlElement (name="connections")
+    public Connections getYawnConnections() {
         return connections;
     }
 
-    public void setConnections(List<Connection> connections) {
+    public void setYawnConnections(Connections connections) {
         this.connections = connections;
+    }
+
+    @XmlElement
+    public String getLogRoot() {
+        return logRoot;
+    }
+
+    public void setLogRoot(String logRoot) {
+        this.logRoot = logRoot;
+    }
+
+    @XmlElement
+    public String getRunFolderPrefixDateFormat() {
+        return runFolderPrefixDateFormat;
+    }
+
+    public void setRunFolderPrefixDateFormat(String runFolderPrefixDateFormat) {
+        this.runFolderPrefixDateFormat = runFolderPrefixDateFormat;
     }
     
     public String toString(){
         StringBuilder sb = new StringBuilder("");
-        for(Connection c : this.connections){
-            sb.append(c.toString()).append("\n");
-        }
+        sb.append("logRoot: ").append(this.logRoot).append("\n")
+            .append("runFolderPrefixDateFormat: ").append("\n")
+            .append(this.getYawnConnections().toString());
         return sb.toString();
     }
 }

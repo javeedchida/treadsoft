@@ -1,7 +1,23 @@
+/*
+ * Copyright (C) 2015 jchida
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.treadsoft.yawn;
 
 import com.treadsoft.yawn.xml.Connection;
-import com.treadsoft.yawn.xml.Connections;
+import com.treadsoft.yawn.xml.YawnConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,7 +25,12 @@ import java.awt.FlowLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -26,10 +47,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -41,26 +59,25 @@ import javax.xml.bind.Unmarshaller;
  * 
  * @author jchida
  */
-public class Main implements ActionListener{
+public class Main implements ActionListener {
     
     private static TextArea queryArea = new TextArea("");
     private static SimpleDateFormat statusDateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
     private static TextArea messageArea = new TextArea("");
     private static TextArea errorArea = new TextArea("");
     private static JTabbedPane statusTabs = new JTabbedPane();
-    private static Connections configuredConnections;
+    private static YawnConfiguration yawnConfiguration;
     private static java.sql.Connection currentConnection;
+    private static Connection currentYawnConnection;
     private static String yawnConfigurationPath;
     
     static{
-        //messageArea.setEditable(false);
-        //errorArea.setEditable(false);
         messageArea.setForeground(new Color(0, 180, 0));
         errorArea.setForeground(new Color(180, 0, 0));
         statusTabs.addTab("Messages", messageArea);
         statusTabs.addTab("Errors", errorArea);
-        errorLog("Yawn! Error messages get posted here.");
-        messageLog("Yawn! Success/Informational messages get posted here.");
+        errorLog("Yawn! Error messages get posted here. Most recent on top.");
+        messageLog("Yawn! Success/Informational messages get posted here. Most recent on top.");
     }
     /**
      * Create the GUI and show it.  For thread safety,
@@ -71,6 +88,18 @@ public class Main implements ActionListener{
         //Create and set up the window.
         JFrame frame = new JFrame("MainLayout");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try{
+                    if(currentConnection != null){
+                        currentConnection.close();
+                    }
+                    System.out.println("Closing current connection, and exiting. Good bye!");
+                }catch( SQLException sqle ){
+                    sqle.printStackTrace();
+                }
+            }
+          });
 
         //Add a panel to hold the connections
         JPanel connectionsPanel = new JPanel(new FlowLayout());
@@ -107,8 +136,7 @@ public class Main implements ActionListener{
         
         JRadioButton connection = null;
         //Read configured connections
-        configuredConnections = readConfiguredConnections();
-        for(Connection c: configuredConnections.getConnections()){
+        for(Connection c: yawnConfiguration.getYawnConnections().getConnections()){
             System.out.println(c);
             connection = new JRadioButton(c.getName());
             connection.setActionCommand("Database " + c.getName());
@@ -148,35 +176,36 @@ public class Main implements ActionListener{
                     currentConnection.close();
                 }
                 currentConnection = createSqlConnection(selectedConnection);
+                currentYawnConnection = selectedConnection;
                 messageLog("Connection established for " + selectedConnection.getName());
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
             }
         }
     }        
-    
+
     /**
      * Read the yawn-connections.xml file and return a Connections object.
      * @return 
      */
-    private Connections readConfiguredConnections(){
-        Connections connections = null;
-        File file = new File(yawnConfigurationPath);
+    private static YawnConfiguration readYawnConfiguration(String path){
+        YawnConfiguration config = null;
+        File file = new File(path);
         try{
-            JAXBContext jaxbContext = JAXBContext.newInstance(Connections.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(YawnConfiguration.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            connections = (Connections) jaxbUnmarshaller.unmarshal(file);
-            //System.out.println(connections);
+            config = (YawnConfiguration) jaxbUnmarshaller.unmarshal(file);
+            System.out.println(config);
         }catch(JAXBException e){
             e.printStackTrace();
             //TODO show an error message
         }
-        return connections;
+        return config;
     }
     
     private Connection getConnectionByName(String name){
         Connection conn = null;
-        for( Connection c : configuredConnections.getConnections() ){
+        for( Connection c : yawnConfiguration.getYawnConnections().getConnections() ){
             if(c.getName().equalsIgnoreCase(name)){
                 conn = c;
                 break;
@@ -205,14 +234,17 @@ public class Main implements ActionListener{
             ResultSet rs = stmt.executeQuery(query);
             ResultSetMetaData metadata = rs.getMetaData();
             messageLog(metadata.getColumnCount() + " columns returned");
+            
             /*
             while (rs.next()) {
                 String coffeeName = rs.getString("COF_NAME");
                 int supplierID = rs.getInt("SUP_ID");
             }
             */
+            writeLogs(metadata);
         } catch (SQLException e) {
             e.printStackTrace();
+            writeLogs(e);
             return e.getMessage();
         } finally {
             if (stmt != null) { stmt.close(); }
@@ -250,7 +282,8 @@ public class Main implements ActionListener{
                             + "README for more information");
                     System.exit(-1);
                 }
-                Main.yawnConfigurationPath = args[0];
+                yawnConfiguration = readYawnConfiguration(args[0]);
+                createLogRootFolder();
                 if(args.length == 2 && args[1] != null && args[1].equalsIgnoreCase("windows")){
                     try{
                         UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -272,5 +305,77 @@ public class Main implements ActionListener{
         errorArea.setText("[" + statusDateFormat.format(new Date()) + "] " + log + "\n" + errorArea.getText());
         statusTabs.setSelectedIndex(1);
     }
+    
+    private static void createLogRootFolder(){
+        File logroot = new File(yawnConfiguration.getLogRoot());
+        if( !logroot.isDirectory() ){
+            logroot.mkdir();
+        }
+    }
+    
+    private static String createDatabaseFolder(){
+        File dbFolder = new File(yawnConfiguration.getLogRoot() + "/" + currentYawnConnection.getName());
+        if( !dbFolder.isDirectory() ){
+            dbFolder.mkdir();
+        }
+        return dbFolder.getAbsolutePath();
+    }
+    
+    private static String createRunFolder(){
+        String runFolderPath = new SimpleDateFormat(yawnConfiguration.getRunFolderPrefixDateFormat()).format(new Date()); 
+        File runFolder = new File(createDatabaseFolder() + "/" + runFolderPath);
+        if( !runFolder.isDirectory() ){
+            runFolder.mkdir();
+        }
+        return runFolder.getAbsolutePath();
+    }
+    
+    private void writeLogs(ResultSetMetaData metadata) throws SQLException {
+        try{
+            File runLog = new File(createRunFolder() + "/run.log");
+            if( !runLog.isFile() ){
+                runLog.createNewFile();
+            }
+            FileWriter runLogWriter = new FileWriter(runLog);
+            runLogWriter.write(metadata.getColumnCount() + " columns returned");
+            runLogWriter.close();
+            
+            //TODO csvWriter
+            
+            File runSql = new File(createRunFolder() + "/run.sql");
+            if( !runSql.isFile() ){
+                runSql.createNewFile();
+            }
+            FileWriter runSqlWriter = new FileWriter(runSql);
+            runSqlWriter.write(queryArea.getText());
+            runSqlWriter.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    private void writeLogs(Exception e) throws SQLException {
+        try{
+            File runLog = new File(createRunFolder() + "/run.log");
+            if( !runLog.isFile() ){
+                runLog.createNewFile();
+            }
+            PrintWriter runLogWriter = new PrintWriter(runLog);
+            e.printStackTrace(runLogWriter);
+            runLogWriter.close();
+            
+            //TODO csvWriter
+            
+            File runSql = new File(createRunFolder() + "/run.sql");
+            if( !runSql.isFile() ){
+                runSql.createNewFile();
+            }
+            FileWriter runSqlWriter = new FileWriter(runSql);
+            runSqlWriter.write(queryArea.getText());
+            runSqlWriter.close();
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+    }    
 
 }

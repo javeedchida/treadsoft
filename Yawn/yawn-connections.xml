@@ -1,6 +1,6 @@
-<yawn-config>
-    <logroot name="yawn-log">c:/dev/temp</logroot>
-    <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss_</runFolderPrefixDateFormat>
+<yawn>
+    <logRoot>c:/dev/temp/yawn-log</logRoot>
+    <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
     <connections>
         <connection name="my-database">
             <driverJar>ojdbc6.jar</driverJar>
@@ -10,4 +10,4 @@
             <password>password</password>
         </connection>
     </connections>
-</yawn-config>
+</yawn>
