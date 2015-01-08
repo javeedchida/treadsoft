@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.xml.bind.JAXBContext;
@@ -44,14 +45,22 @@ public class Main implements ActionListener{
     
     private static TextArea queryArea = new TextArea("");
     private static SimpleDateFormat statusDateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-    private static TextArea statusArea = new TextArea("Yawn! " 
-            + statusDateFormat.format(new Date()));
+    private static TextArea messageArea = new TextArea("");
+    private static TextArea errorArea = new TextArea("");
+    private static JTabbedPane statusTabs = new JTabbedPane();
     private static Connections configuredConnections;
     private static java.sql.Connection currentConnection;
     private static String yawnConfigurationPath;
     
     static{
-        statusArea.setEditable(false);
+        //messageArea.setEditable(false);
+        //errorArea.setEditable(false);
+        messageArea.setForeground(new Color(0, 180, 0));
+        errorArea.setForeground(new Color(180, 0, 0));
+        statusTabs.addTab("Messages", messageArea);
+        statusTabs.addTab("Errors", errorArea);
+        errorLog("Yawn! Error messages get posted here.");
+        messageLog("Yawn! Success/Informational messages get posted here.");
     }
     /**
      * Create the GUI and show it.  For thread safety,
@@ -80,8 +89,7 @@ public class Main implements ActionListener{
         p.add(headerPanel, BorderLayout.PAGE_START);
         p.add(queryArea, BorderLayout.CENTER);
         
-        p.add(statusArea, BorderLayout.PAGE_END);
-        
+        p.add(statusTabs, BorderLayout.PAGE_END);
         frame.setContentPane(p);
 
         //Display the window.
@@ -122,10 +130,10 @@ public class Main implements ActionListener{
                 if(currentConnection != null){
                     String result = executeCommand(currentConnection, queryArea.getText());
                     if(result != null){ // error occurred
-                        statusLog(result);
+                        errorLog(result);
                     }
                 }else{
-                    statusLog("No connection available");
+                    messageLog("No connection available");
                 }
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
@@ -140,7 +148,7 @@ public class Main implements ActionListener{
                     currentConnection.close();
                 }
                 currentConnection = createSqlConnection(selectedConnection);
-                statusLog("Connection established for " + selectedConnection.getName());
+                messageLog("Connection established for " + selectedConnection.getName());
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
             }
@@ -196,7 +204,7 @@ public class Main implements ActionListener{
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             ResultSetMetaData metadata = rs.getMetaData();
-            statusLog(metadata.getColumnCount() + " columns returned");
+            messageLog(metadata.getColumnCount() + " columns returned");
             /*
             while (rs.next()) {
                 String coffeeName = rs.getString("COF_NAME");
@@ -205,9 +213,7 @@ public class Main implements ActionListener{
             */
         } catch (SQLException e) {
             e.printStackTrace();
-            return "------------------------------------------------------------------\n" +
-                    e.getMessage() +
-                    "------------------------------------------------------------------";
+            return e.getMessage();
         } finally {
             if (stmt != null) { stmt.close(); }
         }        
@@ -257,8 +263,14 @@ public class Main implements ActionListener{
         });
     }
     
-    private void statusLog(String log){
-        statusDateFormat.format(new Date());
-        statusArea.setText(log + "\n" + statusArea.getText());
+    private static void messageLog(String log){
+        messageArea.setText("[" + statusDateFormat.format(new Date()) + "] " + log + "\n" + messageArea.getText());
+        statusTabs.setSelectedIndex(0);
     }
+
+    private static void errorLog(String log){
+        errorArea.setText("[" + statusDateFormat.format(new Date()) + "] " + log + "\n" + errorArea.getText());
+        statusTabs.setSelectedIndex(1);
+    }
+
 }
