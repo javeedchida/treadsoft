@@ -37,14 +37,18 @@ java -jar Yawn-1.0.jar c:\temp\yawn-connections.xml
 
 ### Example Configuration File
 ```
-<connections>
-    <connection name="my-database">
-	<driverJar>ojdbc6.jar</driverJar>
-	<driverClass>oracle.jdbc.OracleDriver</driverClass>
-	<jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>
-	<username>username</username>
-	<password>password</password>
-    </connection>
-</connections>
+<yawn>
+    <logRoot>c:/dev/yawn-log</logRoot>
+    <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
+    <connections>
+        <connection name="my-database">
+            <driverJar>ojdbc6.jar</driverJar>
+            <driverClass>oracle.jdbc.OracleDriver</driverClass>
+            <jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>
+            <username>username</username>
+            <password>password</password>
+        </connection>
+    </connections>
+</yawn>
 ```
 *Yawn!*
