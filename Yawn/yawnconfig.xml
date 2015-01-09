@@ -1,5 +1,5 @@
 <yawn>
-    <logRoot>c:/dev/yawn-log</logRoot>
+    <logRoot>./logs</logRoot>
     <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
     <connections>
         <connection name="Sample database">
