@@ -2,7 +2,7 @@
     <logRoot>c:/dev/yawn-log</logRoot>
     <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
     <connections>
-        <connection name="my-database">
+        <connection name="Sample database">
             <driverJar>ojdbc6.jar</driverJar>
             <driverClass>oracle.jdbc.OracleDriver</driverClass>
             <jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>

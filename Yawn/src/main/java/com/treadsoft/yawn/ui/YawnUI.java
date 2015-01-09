@@ -164,6 +164,7 @@ public class YawnUI implements ActionListener {
                 messageLog("Connection established for " + selectedConnection.getName());
             }catch( SQLException sqle ){
                 sqle.printStackTrace();
+                errorLog(sqle.getMessage());
             }
         }
     }        
