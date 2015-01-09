@@ -89,7 +89,12 @@ public class ResultSetReader {
         //write rows
         for(Map m : rows) {
             for (int i = 0; i < columnNames.size(); i++) {
-                fw.write(m.get(columnNames.get(i)).toString());
+                Object value = m.get(columnNames.get(i));
+                if(value != null){
+                    fw.write(value.toString());
+                }else{
+                    fw.write("");
+                }
                 fw.write(",");
             }
             fw.write("\n");
