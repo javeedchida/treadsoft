@@ -29,7 +29,7 @@ If all you need is another database client, you need much more than this little 
 * Be careful if you find yourself yawning when you use Yawn. It is very easy to inadvertently run unintended SQL. On the bright side, the auto-logging becomes useful if you do enter SQL hell - that way you can figure out what command you ran, when you ran it, and what database you ran it against.
 
 ### Typical Use Case For Yawn
-* Yawn might be useful when you want a simple SQL execution environment that lets you run the same SQL statement against multiple database environments (dev, test, stage, prod) in a fairly quick manner. Yawn is good for spot checking result set metadata.
+* Yawn might be useful when you want a simple and uncluttered SQL execution environment that lets you run the SQL statements against multiple database environments (dev, test, stage, etc.) in a fairly quick manner. The results of each are captured in a timestamped folder under a configurable yawn-log folder so you always have a neatly organized history of your yawn-run SQL.
 
 ## System Requirements
 JRE 6 or above
