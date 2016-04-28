@@ -1,0 +1,13 @@
+<yawn>
+    <logRoot>./logs</logRoot>
+    <runFolderPrefixDateFormat>yyyy-MM-dd_HH-mm-ss</runFolderPrefixDateFormat>
+    <connections>
+        <connection name="Sample database">
+            <driverJar>ojdbc6.jar</driverJar>
+            <driverClass>oracle.jdbc.OracleDriver</driverClass>
+            <jdbcConnectionString>jdbc:oracle:thin:@//localhost:1571/service</jdbcConnectionString>
+            <username>username</username>
+            <password>password</password>
+        </connection>
+    </connections>
+</yawn>
